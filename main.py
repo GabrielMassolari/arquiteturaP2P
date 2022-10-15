@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-from node import Node
 from servidorp2p import ServidorP2P
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+from regex import D
 from node import Node
 import socket
 import multiprocessing as mp
@@ -13,6 +14,18 @@ class ServidorP2P:
         self.__t1 = mp.Process(target=self.controle)
         self.__t1.start()
         self.interface()
+
+    
+    def lookup(self, ip):
+        msg = {
+            "codigo": 2,
+            "identificador": self.node.id,
+            "ip_origem_busca": self.node.ip,
+            "id_busca": self.node.id,
+        }
+        msg_json = json.dumps(msg)
+        dest = (ip, self.node.porta)
+        self.udp.sendto(msg_json.encode('utf-8'), dest)
 
 
     def servidor(self):
