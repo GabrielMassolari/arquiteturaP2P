@@ -1,4 +1,3 @@
-from regex import D
 from node import Node
 import socket
 import multiprocessing as mp
@@ -15,8 +14,8 @@ class ServidorP2P:
         self.__t1.start()
         self.interface()
 
-    
-    def lookup(self, ip):
+
+    def lookup_request(self, ip):
         msg = {
             "codigo": 2,
             "identificador": self.node.id,
@@ -28,6 +27,44 @@ class ServidorP2P:
         self.udp.sendto(msg_json.encode('utf-8'), dest)
 
 
+    def reply_lookup(self, msg, ip):
+        dest = (ip, self.node.porta)
+        self.udp.sendto(msg.encode('utf-8'), dest)
+        
+
+    def send_lookup_confirmation(self, string_dict):
+        msg = {
+            "codigo": 66,
+            "id_busca": string_dict["id_busca"],
+            "id_origem": string_dict["identificador"],
+            "ip_origem": string_dict["ip_origem_busca"],
+            "id_sucessor": self.node.id,
+            "ip_sucessor": self.node.ip
+        }
+
+        msg_json = json.dumps(msg)
+        dest = (string_dict["ip"], self.node.porta)
+        self.udp.sendto(msg_json.encode('utf-8'), dest)
+
+
+    def response_lookup_request(self, string_dict):
+        #verificar se ha um unico Node na rede
+        if self.node.antecessor == self.node.sucessor:
+            self.send_lookup_confirmation(string_dict)
+        #Verifica se e o primeiro da fila
+        elif self.node.antecessor["id"] > self.node.id:
+            if self.node.antecessor["id"] < string_dict["identificador"]:
+                self.send_lookup_confirmation(string_dict)
+        else:
+            if string_dict["identificador"] > self.node.id:
+                self.reply_lookup(string_dict, self.node.sucessor["ip"])
+            else:
+                self.send_lookup_confirmation(string_dict)
+
+
+    def response_lookup_confirmation(self, string_dict):
+        pass
+
     def servidor(self):
         print(f"Starting P2P Server on port {self.node.porta}")
         orig = ("", self.node.porta)
@@ -38,19 +75,19 @@ class ServidorP2P:
             string_dict = json.loads(msg_decoded)
             if string_dict["codigo"] == 0:
                 pass
-            if string_dict["codigo"] == 1:
+            elif string_dict["codigo"] == 1:
                 pass
-            if string_dict["codigo"] == 2:
+            elif string_dict["codigo"] == 2:
+                self.response_lookup_request(string_dict)
+            elif string_dict["codigo"] == 3:
                 pass
-            if string_dict["codigo"] == 3:
+            elif string_dict["codigo"] == 64:
                 pass
-            if string_dict["codigo"] == 64:
+            elif string_dict["codigo"] == 65:
                 pass
-            if string_dict["codigo"] == 65:
-                pass
-            if string_dict["codigo"] == 66:
-                pass
-            if string_dict["codigo"] == 67:
+            elif string_dict["codigo"] == 66:
+                self.response_lookup_confirmation(string_dict)
+            elif string_dict["codigo"] == 67:
                 pass
 
 
