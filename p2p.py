@@ -11,7 +11,7 @@ class P2P:
     def __init__(self, ip=None):
         self.node = Node(ip=sys.argv[1])
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.__t1 = mp.Process(target=self.controle)
+        self.__t1 = mp.Process(target=self.servidor)
         self.__t1.start()
         self.interface()
 
