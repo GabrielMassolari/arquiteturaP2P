@@ -9,7 +9,8 @@ import time
 
 class P2P:
     def __init__(self, ip=None):
-        self.node = Node(ip=sys.argv[1])
+        self._inicializado = False
+        self.node = Node(ip=ip)
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__t1 = mp.Process(target=self.servidor)
         self.__t1.start()
@@ -44,7 +45,7 @@ class P2P:
         }
 
         msg_json = json.dumps(msg)
-        dest = (string_dict["ip"], self.node.porta)
+        dest = (string_dict["ip_origem_busca"], self.node.porta)
         self.udp.sendto(msg_json.encode('utf-8'), dest)
 
 
@@ -80,6 +81,8 @@ class P2P:
 
     def response_join_request(self, cliente):
         #q
+        print(self.node.antecessor)
+        print(self.node.sucessor)
         msg = {
             "codigo": 64,
             "id_sucessor": self.node.id,
