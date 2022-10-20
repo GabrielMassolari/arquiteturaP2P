@@ -1,6 +1,5 @@
 from node import Node
 import socket
-import multiprocessing as mp
 import _thread
 import json
 import os
@@ -142,13 +141,14 @@ class P2P:
 
     def join_response(self, string_dict):
         self.node.sucessor = {"id": string_dict["id_sucessor"], "ip": string_dict["ip_sucessor"]}
-        self.node.antecessor = {"id": string_dict["id_sucessor"], "ip": string_dict["ip_sucessor"]}
+        self.node.antecessor = {"id": string_dict["id_antecessor"], "ip": string_dict["ip_antecessor"]}
         self.update_antecessor(self.node.id, self.node.ip)
         self.update_sucessor(self.node.id, self.node.ip)
 
-    
+
     def leave_request(self):
-        if self.node.antecessor["id"] == self.node.sucessor["id"]:
+        #Se tiver apenas um node na rede
+        if self.node.antecessor["id"] == self.node.sucessor["id"] and self.node.antecessor["id"] == self.node.id:
             self.node.sucessor = {"id": None, "ip": None}
             self.node.antecessor = {"id": None, "ip": None}
         else:
@@ -165,6 +165,9 @@ class P2P:
             msg_json = json.dumps(msg)
             self.udp.sendto(msg_json.encode('utf-8'), destAnt)
             self.udp.sendto(msg_json.encode('utf-8'), destSuc)
+            self.node.sucessor = {"id": None, "ip": None}
+            self.node.antecessor = {"id": None, "ip": None}
+            self._inicializado = False
 
 
     def leave_response(self, string_dict, cliente):
@@ -173,7 +176,7 @@ class P2P:
             self.node.antecessor["ip"] = string_dict["ip_antecessor"]
         else:
             self.node.sucessor["id"] = string_dict["id_sucessor"]
-            self.node_sucessor["ip"] = string_dict["ip_sucessor"]
+            self.node.sucessor["ip"] = string_dict["ip_sucessor"]
         
         msg = {
             "codigo": 65,
@@ -228,11 +231,16 @@ class P2P:
         print("-- Entrar Rede P2P --")
         ip = input("Digite o IP do Node: ")
         self.lookup_request(ip)
+        input("Pressione ENTER para continuar")
         #time.sleep(5)
         
 
     def sair_rede_p2p(self):
+        os.system("clear")
+        print("-- Sair da Rede --")
+        print("Saindo da rede...")
         self.leave_request()
+        input("Pressione ENTER para continuar")
         #time.sleep(5)
 
 
