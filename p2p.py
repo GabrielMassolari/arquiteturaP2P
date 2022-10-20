@@ -1,6 +1,7 @@
 from node import Node
 import socket
 import multiprocessing as mp
+import _thread
 import json
 import os
 import sys
@@ -12,8 +13,7 @@ class P2P:
         self._inicializado = False
         self.node = Node(ip=ip)
         self.udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.__t1 = mp.Process(target=self.servidor)
-        self.__t1.start()
+        self.__t1 = _thread.start_new_thread(self.servidor, ())
         self.interface()
 
 
@@ -32,7 +32,7 @@ class P2P:
     def reply_lookup_request(self, msg, ip):
         dest = (ip, self.node.porta)
         self.udp.sendto(msg.encode('utf-8'), dest)
-        
+
 
     def send_lookup_confirmation(self, string_dict):
         msg = {
@@ -196,6 +196,7 @@ class P2P:
             msg, cliente = self.udp.recvfrom(1024)
             msg_decoded = msg.decode('utf-8')
             string_dict = json.loads(msg_decoded)
+            print(string_dict)
             if string_dict["codigo"] == 0:
                 self.response_join_request(cliente)
             elif string_dict["codigo"] == 1:
@@ -227,12 +228,12 @@ class P2P:
         print("-- Entrar Rede P2P --")
         ip = input("Digite o IP do Node: ")
         self.lookup_request(ip)
-        time.sleep(5)
+        #time.sleep(5)
         
 
     def sair_rede_p2p(self):
         self.leave_request()
-        time.sleep(5)
+        #time.sleep(5)
 
 
     def imprimir_informacoes_node(self):
