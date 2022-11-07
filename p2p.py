@@ -80,8 +80,8 @@ class P2P:
 
     def response_join_request(self, cliente):
         #q
-        print(self.node.antecessor)
-        print(self.node.sucessor)
+        #print(self.node.antecessor)
+        #print(self.node.sucessor)
         msg = {
             "codigo": 64,
             "id_sucessor": self.node.id,
@@ -136,7 +136,7 @@ class P2P:
 
     def update_confirmation(self):
         #To Debug
-        print("Update confirmado")
+        print("\nUpdate confirmado")
 
 
     def join_response(self, string_dict):
@@ -199,7 +199,7 @@ class P2P:
             msg, cliente = self.udp.recvfrom(1024)
             msg_decoded = msg.decode('utf-8')
             string_dict = json.loads(msg_decoded)
-            print(string_dict)
+            #print(string_dict)
             if string_dict["codigo"] == 0:
                 self.response_join_request(cliente)
             elif string_dict["codigo"] == 1:
@@ -232,7 +232,6 @@ class P2P:
         ip = input("Digite o IP do Node: ")
         self.lookup_request(ip)
         input("Pressione ENTER para continuar")
-        #time.sleep(5)
         
 
     def sair_rede_p2p(self):
@@ -241,7 +240,6 @@ class P2P:
         print("Saindo da rede...")
         self.leave_request()
         input("Pressione ENTER para continuar")
-        #time.sleep(5)
 
 
     def imprimir_informacoes_node(self):
